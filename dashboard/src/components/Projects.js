@@ -1,101 +1,121 @@
 import React from 'react';
 
-// import Card from '@material-ui/core/Card';
-// import CardActions from '@material-ui/core/CardActions';
-// import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
-// import Typography from '@material-ui/core/Typography';
-// import TextField from '@material-ui/core/TextField';
-
-// import axios from 'axios';
-
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
-import axios from 'axios';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
 import Typography from '@material-ui/core/Typography';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Grid from '@material-ui/core/Grid';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import Container from '@material-ui/core/Container';
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 import { withStyles } from '@material-ui/core/styles';
 
+import api from '../services/api'
+import Project from './Project';
+import NewProject from './NewProject'
+
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 class Projects extends React.Component {
   constructor(props) {
     super(props);
 
-    this.logout = this.logout.bind(this);
-    this.renderProject = this.renderProject.bind(this);
-  }
-
-  logout() {
-    axios.defaults.headers.common['Authorization'] = ''
-
-    this.props.logout()
-  }
-
-  renderProject(project) {
-    const a = () => {
-
-      axios.get('http://localhost:8000/users/?format=json').then((resp) => console.info(resp))
+    this.state = {
+      projects: [],
+      snackopen: false,
+      snackmsg: '',
+      snackerrormsg: ''
     }
-    // debugger
-    console.info(this.props.classes.root)
-    return (<Card className={this.props.classes.root}>
-      <CardHeader
 
-        title="Shrimp and Chorizo Paella"
-        subheader="September 14, 2016"
-      />
-      <CardMedia
+    this.refreshProjects = this.refreshProjects.bind(this);
+    this.removeProject = this.removeProject.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.showSuccessMsg = this.showSuccessMsg.bind(this);
+    this.showErrorMsg = this.showErrorMsg.bind(this);
+  }
 
-        image="/static/images/cards/paella.jpg"
-        title="Paella dish"
-      />
-      <CardContent>
-        <Typography variant="body2" color="textSecondary" component="p">
-          This impressive paella is a perfect party dish and a fun meal to cook together with your
-          guests. Add 1 cup of frozen peas along with the mussels, if you like.
-        </Typography>
-      </CardContent>
-      <CardActions disableSpacing></CardActions>
-    </Card>)
-    return (
-      <List aria-label="main mailbox folders">
-        <ListItem button>
-          <ListItemIcon>
-            icon
-          </ListItemIcon>
-          <ListItemText primary="Inbox" />
-        </ListItem>
-        <ListItem button onClick={a}>
-          <ListItemIcon>
-            icon
-          </ListItemIcon>
-          <ListItemText primary="Drafts" />
-        </ListItem>
-      </List>
-    )
+  componentDidMount() {
+    this.refreshProjects()
+  }
+
+  showSuccessMsg(message) {
+    return this.setState({snackopen: true, snackmsg: message })
+  }
+
+  showErrorMsg(message) {
+    return this.setState({snackopen: true, snackerrormsg: message })
+  }
+
+  refreshProjects() {
+    return api.get('/projects/').then((response) => {
+      this.setState({ projects: response.data })
+    }).catch((error) => {
+      const { detail } = error.response.data;
+      this.showErrorMsg(detail)
+    })
+  }
+
+  removeProject(project) {
+    this.setState({snackopen: true})
+    return api.delete(`/projects/${project.id}`).then((response) => {
+      // this.refreshProjects()
+      const projects = this.state.projects.filter((item) => item.id !== project.id)
+
+      this.setState({ projects })
+      this.showSuccessMsg('Project successfully removed')
+    }).catch((error) => {
+      const { detail } = error.response.data;
+
+      this.showErrorMsg(detail)
+    })
+  }
+
+  renderProjects() {
+    const { projects } = this.state;
+
+    if (projects.length === 0) {
+      return (<Typography variant="overline" display="block" gutterBottom>No projects</Typography>)
+    }
+
+    return projects.map((project) => <Project project={project} key={project.id} onRemove={this.removeProject} />)
+  }
+
+  handleClose (event, reason) {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    this.setState({snackopen: false, snackerrormsg: '', snackmsg: ''});
   }
 
   render() {
+    const { snackopen, snackerrormsg, snackmsg } = this.state;
 
     return (
-      <div>
-        <Typography variant="h4">
-          List of projects
-        </Typography>
-        { this.props.projects.map((project) => this.renderProject(project)) }
+      <Container>
+        <Grid container justify="flex-end">
+          <ButtonGroup disableElevation>
+            <Button onClick={this.refreshProjects} startIcon={<RefreshIcon />}>
+              Refresh
+            </Button>
+            <Button onClick={this.props.handleLogout}>
+              Logout
+            </Button>
+          </ButtonGroup>
+        </Grid>
 
-        <Button onClick={this.logout}>
-          Logout
-      </Button>
-      </div>
+        { this.renderProjects() }
+
+        <NewProject onCreated={this.refreshProjects} />
+
+        <Snackbar open={snackopen} onClose={this.handleClose} autoHideDuration={3000}>
+          <Alert  severity={snackmsg.length > 0 ? 'success' : 'error'}> { snackmsg.length > 0 ? snackmsg : snackerrormsg }</Alert>
+        </Snackbar>
+      </Container>
     );
   }
 }
@@ -104,6 +124,9 @@ const styles = {
   root: {
     marginTop: 20,
   },
+  addProjectBtn: {
+    marginTop: 20,
+  }
 };
 
 

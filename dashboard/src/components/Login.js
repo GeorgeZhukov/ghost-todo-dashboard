@@ -6,9 +6,15 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
+import ArrowRight from '@material-ui/icons/ArrowRight';
+import Alert from '@material-ui/lab/Alert';
+import Collapse from '@material-ui/core/Collapse';
+import Grid from '@material-ui/core/Grid';
 
 
-import axios from 'axios';
+import { withStyles } from '@material-ui/core/styles';
+
+import api from '../services/api';
 
 
 class Login extends React.Component {
@@ -16,67 +22,151 @@ class Login extends React.Component {
     super(props);
 
     this.state = {
-      username: '',
-      password: '',
-      error: null
+      form: {
+        error: null,
+        username: {
+          value: 'george',
+          error: null,
+        },
+        password: {
+          value: 'password',
+          error: null,
+        },
+      },
     };
 
-    this.onEmailChanged = this.onEmailChanged.bind(this);
+    this.onUsernameChanged = this.onUsernameChanged.bind(this);
     this.onPasswordChanged = this.onPasswordChanged.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
 
-  onEmailChanged(event) {
-    this.setState({ email: event.target.value });
+  onUsernameChanged(event) {
+    const form = {
+      ...this.state.form,
+      error: null,
+      username: {
+        value: event.target.value,
+        error: null
+      }
+    }
+    this.setState({ form });
   }
 
   onPasswordChanged(event) {
-    this.setState({ password: event.target.value });
+    const form = {
+      ...this.state.form,
+      error: null,
+      password: {
+        value: event.target.value,
+        error: null
+      }
+    }
+    this.setState({ form });
   }
 
   onSubmit(event) {
     event.preventDefault();
 
-    const {email, password} = this.state;
-    const params = { email, password };
+    const { form: { username, password } } = this.state;
+    const params = {
+      username: username.value,
+      password: password.value,
+    }
 
-    axios.post('http://localhost:8000/api-token-auth/?format=json', params).then((response) => {
+    api.post('/api-token-auth/', params).then((response) => {
       const { token } = response.data;
 
-      console.info('token: ', token)
-      axios.defaults.headers.common['Authorization'] = `Token ${token}`
+      localStorage.setItem('token', token);
 
-      this.props.onLogin({projects: [1,2,3]}); // TODO: fixit
+      this.props.onLogin({ username: params.username }); // TODO: fixit
     }).catch((error) => {
-      const {detail, non_field_errors} = error.response.data;
+      const { detail, non_field_errors, password, username } = error.response.data;
 
-      this.setState({ error: detail || non_field_errors });
+      const prevForm = this.state.form
+      const form = {
+        ...prevForm,
+        error: detail || non_field_errors,
+        username: {
+          ...prevForm.username,
+          error: username,
+        },
+        password: {
+          ...prevForm.password,
+          error: password,
+        }
+      }
+
+      this.setState({ form });
     })
-    console.info('on submit: ', email, password)
   }
 
   render() {
-    const { error, username, password } = this.state;
+    const { form: { error, username, password} } = this.state;
 
     return (
-      <form autoComplete="off" onSubmit={this.onSubmit}>
-        <Card variant="outlined" >
+      <form autoComplete="off" onSubmit={this.onSubmit} noValidate className={this.props.classes.root}>
+        <Card  >
           <CardContent>
             <Typography variant="h5" component="h2">Login</Typography>
             <Typography color="textSecondary">Enter your data to login</Typography>
 
-            { error && <Typography color="error">{error}</Typography> }
+            <Collapse in={!!error}>
+              <Alert severity="error">{error}</Alert>
+            </Collapse>
 
-            <TextField label="Login" value={username} onChange={this.onEmailChanged} autoComplete="off" autoFocus required fullWidth variant="outlined" margin="normal" />
-            <TextField label="Password" value={password} onChange={this.onPasswordChanged} autoComplete="off" fullWidth required variant="outlined" type="password" />
+            <TextField
+              label="Username"
+              value={username.value}
+              onChange={this.onUsernameChanged}
+              autoComplete="off"
+              autoFocus
+              required
+              fullWidth
+              margin="normal"
+              error={!!username.error}
+              helperText={username.error}
+            />
+            <TextField
+              label="Password"
+              value={password.value}
+              onChange={this.onPasswordChanged}
+              autoComplete="off"
+              fullWidth
+              required
+              type="password"
+              error={!!password.error}
+              helperText={password.error}
+            />
+
           </CardContent>
           <CardActions>
-            <Button type="submit" variant="contained" fullWidth color="primary">Login</Button>
+            <Grid container justify="flex-end">
+              <Button
+                startIcon={<ArrowRight />}
+                type="submit"
+                variant="contained"
+                color="default"
+                disableElevation
+                disabled={!!error}
+              >
+                Login
+              </Button>
+            </Grid>
+
           </CardActions>
         </Card>
       </form>
     );
   }
 }
-export default Login;
+
+
+const styles = {
+  root: {
+    width: 400,
+    margin: "0 auto"
+  },
+};
+
+export default withStyles(styles)(Login);
 
