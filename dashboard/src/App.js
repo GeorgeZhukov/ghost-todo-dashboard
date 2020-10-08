@@ -3,6 +3,7 @@ import React from 'react';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 import './App.css';
 
@@ -19,25 +20,41 @@ class App extends React.Component {
 
     this.loggedIn = this.loggedIn.bind(this);
     this.content = this.content.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
+  }
+
+  componentDidMount() {
+    const token = localStorage.getItem('token');
+
+    this.handleLogin(token ? {} : null)
   }
 
   loggedIn() {
     return !!this.state.user;
   }
 
+  handleLogout() {
+    localStorage.removeItem('token');
+    return this.setState({ user: null });
+  }
+
+  handleLogin(user) {
+    return this.setState({ user });
+  }
+
   content() {
     if (this.loggedIn()) {
-      const logout = () => {
-        this.setState({ user: null })
-      }
-      return <Projects logout={logout} projects={this.state.user.projects} />
+      return (
+        <Projects
+          handleLogout={this.handleLogout}
+          user={this.state.user}
+          projects={this.state.user.projects}
+        />
+      )
     }
 
-    const handleLogin = (user) => {
-      this.setState({ user })
-    }
-
-    return <Login onLogin={handleLogin}/>
+    return (<Login onLogin={this.handleLogin}/>)
   }
 
   render() {
@@ -45,6 +62,8 @@ class App extends React.Component {
 
     return (
       <Container fixed>
+        <CssBaseline />
+
         <Grid className={classes.root} justify="center" container spacing={3}>
           <Grid item sm={6}>
             { this.content() }
@@ -52,13 +71,12 @@ class App extends React.Component {
         </Grid>
       </Container>
     );
-
   }
 }
 
 const styles = {
   root: {
-    marginTop: 100,
+    marginTop: 40,
   },
 };
 
