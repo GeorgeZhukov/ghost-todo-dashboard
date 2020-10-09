@@ -8,6 +8,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
 
 import Login from './components/Login';
+import Signup from './components/Signup';
+
 import Projects from './components/Projects';
 
 class App extends React.Component {
@@ -54,7 +56,8 @@ class App extends React.Component {
       )
     }
 
-    return (<Login onLogin={this.handleLogin}/>)
+    // return (<Login onLogin={this.handleLogin}/>)
+    return (<Signup onLogin={this.handleLogin}/>)
   }
 
   render() {
