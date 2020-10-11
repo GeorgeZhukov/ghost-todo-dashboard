@@ -51,9 +51,11 @@ class Projects extends React.Component {
   }
 
   refreshProjects() {
+    this.setState({ projects: [] })
     return api.get('/projects/').then((response) => {
       this.setState({ projects: response.data })
     }).catch((error) => {
+      debugger
       const { detail } = error.response.data;
       this.showErrorMsg(detail)
     })

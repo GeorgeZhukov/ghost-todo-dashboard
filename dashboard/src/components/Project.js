@@ -9,7 +9,12 @@ import CardActions from '@material-ui/core/CardActions';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 
+import Tasks from './Tasks'
+
 import { withStyles } from '@material-ui/core/styles';
+
+import moment from 'moment';
+import { IconButton } from '@material-ui/core';
 
 
 class Project extends React.Component {
@@ -26,9 +31,21 @@ class Project extends React.Component {
     this.setState({ project: this.props.project })
   }
 
+  renderRemoveBtn() {
+    const { project } = this.state
+    const { onRemove } = this.props
+
+    return (
+      <IconButton onClick={() => onRemove(project)}>
+        <DeleteIcon />
+      </IconButton>
+    )
+  }
+
+
   render() {
     const { project } = this.state
-    const { classes, onRemove } = this.props
+    const { classes } = this.props
 
     if (!project) {
       return null
@@ -38,17 +55,15 @@ class Project extends React.Component {
       <Card className={classes.root}>
         <CardHeader
           title={project.name}
-          subheader={project.created_at}
+          subheader={moment(project.created_at).format('MMMM Do YYYY, h:mm:ss a')}
+          action={this.renderRemoveBtn()}
         />
         <CardContent>
+          <Tasks project={project} />
 
         </CardContent>
         <CardActions disableSpacing>
-          <Button
-            size="small"
-            onClick={() => onRemove(project)}
-            startIcon={<DeleteIcon />}
-          >Remove</Button>
+
         </CardActions>
       </Card>
     );
