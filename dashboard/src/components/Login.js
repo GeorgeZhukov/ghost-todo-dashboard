@@ -143,25 +143,26 @@ class Login extends React.Component {
             <Grid container justify="flex-end">
               <Button
                 startIcon={<ArrowRight />}
-                type="submit"
                 variant="contained"
                 color="default"
+                disableElevation
+                onClick={this.props.onShowSignup}
+              >
+                Signup
+              </Button>
+
+              <Button
+                startIcon={<ArrowRight />}
+                type="submit"
+                variant="contained"
+                color="primary"
                 disableElevation
                 disabled={!!error}
               >
                 Login
               </Button>
-              
-              <Button
-                startIcon={<ArrowRight />}
-                type="submit"
-                variant="contained"
-                color="default"
-                disableElevation
-                disabled={!!error}
-              >
-                Signup
-              </Button>
+
+
             </Grid>
 
           </CardActions>

@@ -32,12 +32,10 @@ class Signup extends React.Component {
           value: '',
           error: null,
         },
-
         passwordConfirm: {
           value: '',
           error: null,
         },
-
       },
     };
 
@@ -98,7 +96,7 @@ class Signup extends React.Component {
       }
 
       this.setState({ form });
-      return 
+      return
     }
 
     if(password.value.length < 4 ){
@@ -112,7 +110,7 @@ class Signup extends React.Component {
       }
 
       this.setState({ form });
-      return 
+      return
     }
     if (password.value !== passwordConfirm.value){
       const form = {
@@ -125,23 +123,17 @@ class Signup extends React.Component {
       }
 
       this.setState({ form });
-      return 
+      return
     }
-    
+
     const params = {
       username: username.value,
       password: password.value,
     }
 
     api.post('/users/', params).then((response) => {
-        debugger
-      const { token } = response.data;
-
-      localStorage.setItem('token', token);
-
-      this.props.onLogin({ username: params.username }); // TODO: fixit
+      this.props.onClose();
     }).catch((error) => {
-        debugger
       const { detail, non_field_errors, password, username } = error.response.data;
 
       const prevForm = this.state.form
@@ -214,17 +206,30 @@ class Signup extends React.Component {
           </CardContent>
           <CardActions>
             <Grid container justify="flex-end">
-              
+              <Button
+                startIcon={<ArrowRight />}
+                variant="contained"
+                color="default"
+                disableElevation
+                disabled={!!error}
+                onClick={this.props.onClose}
+              >
+                Back
+              </Button>
+
               <Button
                 startIcon={<ArrowRight />}
                 type="submit"
                 variant="contained"
-                color="default"
+                color="primary"
                 disableElevation
                 disabled={!!error}
               >
                 Signup
               </Button>
+
+
+
             </Grid>
 
           </CardActions>
