@@ -8,6 +8,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
 
 import Login from './components/Login';
+import Signup from './components/Signup';
+
 import Projects from './components/Projects';
 
 class App extends React.Component {
@@ -15,13 +17,15 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      user: null
+      user: null,
+      showSignUp: false
     };
 
     this.loggedIn = this.loggedIn.bind(this);
     this.content = this.content.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
+    this.toggleSignupForm = this.toggleSignupForm.bind(this);
   }
 
   componentDidMount() {
@@ -43,6 +47,10 @@ class App extends React.Component {
     return this.setState({ user });
   }
 
+  toggleSignupForm() {
+    this.setState({ showSignUp: !this.state.showSignUp });
+  }
+
   content() {
     if (this.loggedIn()) {
       return (
@@ -54,7 +62,11 @@ class App extends React.Component {
       )
     }
 
-    return (<Login onLogin={this.handleLogin}/>)
+    if (this.state.showSignUp) {
+      return (<Signup onClose={this.toggleSignupForm}/>)
+    }
+
+    return (<Login onLogin={this.handleLogin} onShowSignup={this.toggleSignupForm}/>)
   }
 
   render() {

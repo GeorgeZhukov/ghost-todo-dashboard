@@ -17,7 +17,7 @@ import { withStyles } from '@material-ui/core/styles';
 import api from '../services/api';
 
 
-class Login extends React.Component {
+class Signup extends React.Component {
   constructor(props) {
     super(props);
 
@@ -25,11 +25,15 @@ class Login extends React.Component {
       form: {
         error: null,
         username: {
-          value: 'george',
+          value: '',
           error: null,
         },
         password: {
-          value: 'password',
+          value: '',
+          error: null,
+        },
+        passwordConfirm: {
+          value: '',
           error: null,
         },
       },
@@ -37,6 +41,7 @@ class Login extends React.Component {
 
     this.onUsernameChanged = this.onUsernameChanged.bind(this);
     this.onPasswordChanged = this.onPasswordChanged.bind(this);
+    this.onPasswordConfirmChanged = this.onPasswordConfirmChanged.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
 
@@ -64,21 +69,70 @@ class Login extends React.Component {
     this.setState({ form });
   }
 
+  onPasswordConfirmChanged(event) {
+    const form = {
+      ...this.state.form,
+      error: null,
+      passwordConfirm: {
+        value: event.target.value,
+        error: null
+      }
+    }
+    this.setState({ form });
+  }
+
   onSubmit(event) {
     event.preventDefault();
 
-    const { form: { username, password } } = this.state;
+    const { form: { username, password, passwordConfirm } } = this.state;
+    if(username.value.length< 4 ){
+      const form = {
+        ...this.state.form,
+
+        username: {
+          ...this.state.form.username,
+          error: 'username is too short',
+        }
+      }
+
+      this.setState({ form });
+      return
+    }
+
+    if(password.value.length < 4 ){
+      const form = {
+        ...this.state.form,
+
+        passwordConfirm: {
+          ...this.state.form.passwordConfirm,
+          error: 'password is too short',
+        }
+      }
+
+      this.setState({ form });
+      return
+    }
+    if (password.value !== passwordConfirm.value){
+      const form = {
+        ...this.state.form,
+
+        passwordConfirm: {
+          ...this.state.form.passwordConfirm,
+          error: 'Passwords do not match',
+        }
+      }
+
+      this.setState({ form });
+      return
+    }
+
     const params = {
       username: username.value,
       password: password.value,
     }
 
-    api.post('/api-token-auth/', params).then((response) => {
-      const { token } = response.data;
-
-      localStorage.setItem('token', token);
-
-      this.props.onLogin({ username: params.username }); // TODO: fixit
+    api.post('/users/', params).then((response) => {
+      this.props.onClose();
     }).catch((error) => {
       const { detail, non_field_errors, password, username } = error.response.data;
 
@@ -101,14 +155,14 @@ class Login extends React.Component {
   }
 
   render() {
-    const { form: { error, username, password} } = this.state;
+    const { form: { error, username, password, passwordConfirm} } = this.state;
 
     return (
       <form autoComplete="off" onSubmit={this.onSubmit} noValidate className={this.props.classes.root}>
         <Card  >
           <CardContent>
-            <Typography variant="h5" component="h2">Login</Typography>
-            <Typography color="textSecondary">Enter your data to login</Typography>
+            <Typography variant="h5" component="h2">Signup</Typography>
+            <Typography color="textSecondary">Enter your data to Signup</Typography>
 
             <Collapse in={!!error}>
               <Alert severity="error">{error}</Alert>
@@ -137,6 +191,17 @@ class Login extends React.Component {
               error={!!password.error}
               helperText={password.error}
             />
+            <TextField
+            label="Password confirm"
+            value={passwordConfirm.value}
+            onChange={this.onPasswordConfirmChanged}
+            autoComplete="off"
+            fullWidth
+            required
+            type="password"
+            error={!!passwordConfirm.error}
+            helperText={passwordConfirm.error}
+          />
 
           </CardContent>
           <CardActions>
@@ -146,9 +211,10 @@ class Login extends React.Component {
                 variant="contained"
                 color="default"
                 disableElevation
-                onClick={this.props.onShowSignup}
+                disabled={!!error}
+                onClick={this.props.onClose}
               >
-                Signup
+                Back
               </Button>
 
               <Button
@@ -159,8 +225,9 @@ class Login extends React.Component {
                 disableElevation
                 disabled={!!error}
               >
-                Login
+                Signup
               </Button>
+
 
 
             </Grid>
@@ -180,5 +247,5 @@ const styles = {
   },
 };
 
-export default withStyles(styles)(Login);
+export default withStyles(styles)(Signup);
 
