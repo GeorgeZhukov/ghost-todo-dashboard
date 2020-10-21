@@ -46,7 +46,6 @@ class NewProject extends React.Component {
 
   addProject() {
     const params = {
-      owner: 'http://localhost:8000/users/1/',
       name: this.state.form.name.value,
     }
 
