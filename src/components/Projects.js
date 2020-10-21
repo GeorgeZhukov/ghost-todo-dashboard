@@ -8,6 +8,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Container from '@material-ui/core/Container';
 import RefreshIcon from '@material-ui/icons/Refresh';
+import IconButton from '@material-ui/core/IconButton';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -51,12 +52,13 @@ class Projects extends React.Component {
   }
 
   refreshProjects() {
+
     this.setState({ projects: [] })
+    // localStorage.removeItem('token')
 
     return api.get(config.urls.projects).then((response) => {
       this.setState({ projects: response.data })
     }).catch((error) => {
-      debugger
       const { detail } = error.response.data;
       this.showErrorMsg(detail)
     })
@@ -100,15 +102,10 @@ class Projects extends React.Component {
 
     return (
       <Container>
-        <Grid container justify="flex-end">
-          <ButtonGroup disableElevation>
-            <Button onClick={this.refreshProjects} startIcon={<RefreshIcon />}>
-              Refresh
-            </Button>
-            <Button onClick={this.props.handleLogout}>
-              Logout
-            </Button>
-          </ButtonGroup>
+        <Grid container justify="center">
+          <IconButton onClick={this.refreshProjects} aria-label="delete">
+            <RefreshIcon />
+          </IconButton>
         </Grid>
 
         { this.renderProjects() }

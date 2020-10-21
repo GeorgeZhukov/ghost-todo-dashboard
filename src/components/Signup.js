@@ -10,6 +10,7 @@ import ArrowRight from '@material-ui/icons/ArrowRight';
 import Alert from '@material-ui/lab/Alert';
 import Collapse from '@material-ui/core/Collapse';
 import Grid from '@material-ui/core/Grid';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 
 
 import { withStyles } from '@material-ui/core/styles';
@@ -173,7 +174,7 @@ class Signup extends React.Component {
               label="Username"
               value={username.value}
               onChange={this.onUsernameChanged}
-              autoComplete="off"
+              autoComplete="new-password"
               autoFocus
               required
               fullWidth
@@ -185,7 +186,7 @@ class Signup extends React.Component {
               label="Password"
               value={password.value}
               onChange={this.onPasswordChanged}
-              autoComplete="off"
+              autoComplete="new-password"
               fullWidth
               required
               type="password"
@@ -193,44 +194,41 @@ class Signup extends React.Component {
               helperText={password.error}
             />
             <TextField
-            label="Password confirm"
-            value={passwordConfirm.value}
-            onChange={this.onPasswordConfirmChanged}
-            autoComplete="off"
-            fullWidth
-            required
-            type="password"
-            error={!!passwordConfirm.error}
-            helperText={passwordConfirm.error}
-          />
+              label="Password confirm"
+              value={passwordConfirm.value}
+              onChange={this.onPasswordConfirmChanged}
+              autoComplete="new-password"
+              fullWidth
+              required
+              type="password"
+              error={!!passwordConfirm.error}
+              helperText={passwordConfirm.error}
+            />
 
           </CardContent>
           <CardActions>
             <Grid container justify="flex-end">
-              <Button
-                startIcon={<ArrowRight />}
-                variant="contained"
-                color="default"
-                disableElevation
-                disabled={!!error}
-                onClick={this.props.onClose}
-              >
-                Back
-              </Button>
+              <ButtonGroup color="primary" aria-label="outlined primary button group">
+                <Button
+                  color="default"
+                  disableElevation
+                  disabled={!!error}
+                  onClick={this.props.onClose}
+                >
+                  Back
+                </Button>
 
-              <Button
-                startIcon={<ArrowRight />}
-                type="submit"
-                variant="contained"
-                color="primary"
-                disableElevation
-                disabled={!!error}
-              >
-                Signup
-              </Button>
-
-
-
+                <Button
+                  startIcon={<ArrowRight />}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disableElevation
+                  disabled={!!error}
+                >
+                  Signup
+                </Button>
+              </ButtonGroup>
             </Grid>
 
           </CardActions>

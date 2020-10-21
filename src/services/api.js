@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 
-export default axios.create({
+const client = axios.create({
   baseURL: config.apiUrl,
   headers: {
     Authorization: {
@@ -17,3 +17,15 @@ export default axios.create({
     }
   }
 });
+
+client.interceptors.response.use((response) => response, (error) => {
+
+  if (error.response.status === 403) {
+    localStorage.removeItem(config.localStorageTokenKey);
+    window.location.reload();
+  }
+
+  return Promise.reject(error);
+})
+
+export default client;
