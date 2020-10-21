@@ -15,6 +15,7 @@ import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
 import api from '../services/api';
+import config from '../config';
 
 
 class Login extends React.Component {
@@ -25,11 +26,11 @@ class Login extends React.Component {
       form: {
         error: null,
         username: {
-          value: 'george',
+          value: '',
           error: null,
         },
         password: {
-          value: 'password',
+          value: '',
           error: null,
         },
       },
@@ -73,10 +74,10 @@ class Login extends React.Component {
       password: password.value,
     }
 
-    api.post('/api-token-auth/', params).then((response) => {
+    api.post(config.urls.auth, params).then((response) => {
       const { token } = response.data;
 
-      localStorage.setItem('token', token);
+      localStorage.setItem(config.localStorageTokenKey, token);
 
       this.props.onLogin({ username: params.username }); // TODO: fixit
     }).catch((error) => {

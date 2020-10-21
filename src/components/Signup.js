@@ -15,6 +15,7 @@ import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
 import api from '../services/api';
+import config from '../config'
 
 
 class Signup extends React.Component {
@@ -131,7 +132,7 @@ class Signup extends React.Component {
       password: password.value,
     }
 
-    api.post('/users/', params).then((response) => {
+    api.post(config.urls.users, params).then((response) => {
       this.props.onClose();
     }).catch((error) => {
       const { detail, non_field_errors, password, username } = error.response.data;

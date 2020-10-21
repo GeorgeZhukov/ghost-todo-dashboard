@@ -14,7 +14,7 @@ import { withStyles } from '@material-ui/core/styles';
 import api from '../services/api'
 import Project from './Project';
 import NewProject from './NewProject'
-
+import config from '../config'
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -52,7 +52,8 @@ class Projects extends React.Component {
 
   refreshProjects() {
     this.setState({ projects: [] })
-    return api.get('/projects/').then((response) => {
+
+    return api.get(config.urls.projects).then((response) => {
       this.setState({ projects: response.data })
     }).catch((error) => {
       debugger
@@ -63,7 +64,7 @@ class Projects extends React.Component {
 
   removeProject(project) {
     this.setState({snackopen: true})
-    return api.delete(`/projects/${project.id}`).then((response) => {
+    return api.delete(`${config.urls.projects}${project.id}`).then((response) => {
       // this.refreshProjects()
       const projects = this.state.projects.filter((item) => item.id !== project.id)
 
