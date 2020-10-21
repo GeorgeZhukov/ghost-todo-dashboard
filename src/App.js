@@ -5,6 +5,8 @@ import Grid from '@material-ui/core/Grid';
 
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Avatar from '@material-ui/core/Avatar';
+import Chip from '@material-ui/core/Chip';
 
 import './App.css';
 
@@ -15,6 +17,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Projects from './components/Projects';
 import Config from './components/Config';
+import api from './services/api'
 
 class App extends React.Component {
   constructor(props) {
@@ -30,12 +33,23 @@ class App extends React.Component {
     this.handleLogout = this.handleLogout.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
     this.toggleSignupForm = this.toggleSignupForm.bind(this);
+    this.loadUserByToken = this.loadUserByToken.bind(this);
+    this.renderHeader = this.renderHeader.bind(this);
   }
 
   componentDidMount() {
-    const token = localStorage.getItem(config.localStorageTokenKey);
+    this.loadUserByToken();
+  }
 
-    this.handleLogin(token ? {} : null)
+  loadUserByToken () {
+    const token = localStorage.getItem(config.localStorageTokenKey);
+    if (token) {
+      api.get(config.urls.currentUser).then((resp) => {
+        this.handleLogin(resp.data)
+      }).catch((error) => {
+        this.handleLogin(null)
+      })
+    }
   }
 
   loggedIn() {
@@ -70,7 +84,22 @@ class App extends React.Component {
       return (<Signup onClose={this.toggleSignupForm}/>)
     }
 
-    return (<Login onLogin={this.handleLogin} onShowSignup={this.toggleSignupForm}/>)
+    return (<Login onLogin={this.loadUserByToken} onShowSignup={this.toggleSignupForm}/>)
+  }
+
+  renderHeader() {
+    const { user } = this.state
+
+    return (
+      <Grid container justify="flex-end">
+        {user && <Chip
+          avatar={user.userprofile && <Avatar alt="Natacha" src={user.userprofile.avatar} />}
+          label={user.username}
+          onDelete={this.handleLogout}
+        />}
+        <Config config={config} />
+      </Grid>
+    )
   }
 
   render() {
@@ -80,9 +109,7 @@ class App extends React.Component {
       <Container fixed>
         <CssBaseline />
 
-        <Grid container justify="flex-end">
-          <Config config={config} />
-        </Grid>
+        {this.renderHeader()}
 
         <Grid className={classes.root} justify="center" container spacing={3}>
           <Grid item sm={6}>

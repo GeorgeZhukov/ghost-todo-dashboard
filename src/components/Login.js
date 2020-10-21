@@ -4,6 +4,7 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import ArrowRight from '@material-ui/icons/ArrowRight';
@@ -119,7 +120,7 @@ class Login extends React.Component {
               label="Username"
               value={username.value}
               onChange={this.onUsernameChanged}
-              autoComplete="off"
+              autoComplete="new-password"
               autoFocus
               required
               fullWidth
@@ -131,7 +132,7 @@ class Login extends React.Component {
               label="Password"
               value={password.value}
               onChange={this.onPasswordChanged}
-              autoComplete="off"
+              autoComplete="new-password"
               fullWidth
               required
               type="password"
@@ -142,26 +143,27 @@ class Login extends React.Component {
           </CardContent>
           <CardActions>
             <Grid container justify="flex-end">
-              <Button
-                startIcon={<ArrowRight />}
-                variant="contained"
-                color="default"
-                disableElevation
-                onClick={this.props.onShowSignup}
-              >
-                Signup
-              </Button>
+              <ButtonGroup color="primary" aria-label="outlined primary button group">
+                <Button
+                  color="default"
+                  disableElevation
+                  onClick={this.props.onShowSignup}
+                >
+                  Signup
+                </Button>
 
-              <Button
-                startIcon={<ArrowRight />}
-                type="submit"
-                variant="contained"
-                color="primary"
-                disableElevation
-                disabled={!!error}
-              >
-                Login
-              </Button>
+                <Button
+                  startIcon={<ArrowRight />}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disableElevation
+                  disabled={!!error}
+                >
+                  Login
+                </Button>
+              </ButtonGroup>
+
 
 
             </Grid>

@@ -8,6 +8,7 @@ const base = {
     auth: '/api-token-auth/',
     projects: '/projects/',
     users: '/users/',
+    currentUser: '/users/current_user/'
   },
 };
 
