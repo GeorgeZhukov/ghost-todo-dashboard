@@ -13,6 +13,7 @@ import AddIcon from '@material-ui/icons/Add';
 import { withStyles } from '@material-ui/core/styles';
 
 import api from '../services/api'
+import config from '../config';
 
 class NewProject extends React.Component {
   constructor(props) {
@@ -49,7 +50,8 @@ class NewProject extends React.Component {
       name: this.state.form.name.value,
     }
 
-    return api.post('/projects/', params).then((response) => {
+
+    return api.post(config.urls.projects, params).then((response) => {
       const project = response.data;
 
       this.setState({

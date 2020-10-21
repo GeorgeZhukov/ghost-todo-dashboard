@@ -6,13 +6,13 @@ export default axios.create({
   headers: {
     Authorization: {
       toString () {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem(config.localStorageTokenKey)
 
         if (!token) {
           return null
         }
 
-        return `Token ${token}`
+        return `${config.tokenPrefix} ${token}`
       }
     }
   }

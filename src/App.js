@@ -2,15 +2,19 @@ import React from 'react';
 
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
+
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import './App.css';
 
+
+import config from './config'
+
 import Login from './components/Login';
 import Signup from './components/Signup';
-
 import Projects from './components/Projects';
+import Config from './components/Config';
 
 class App extends React.Component {
   constructor(props) {
@@ -18,7 +22,7 @@ class App extends React.Component {
 
     this.state = {
       user: null,
-      showSignUp: false
+      showSignUp: false,
     };
 
     this.loggedIn = this.loggedIn.bind(this);
@@ -29,7 +33,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(config.localStorageTokenKey);
 
     this.handleLogin(token ? {} : null)
   }
@@ -39,7 +43,7 @@ class App extends React.Component {
   }
 
   handleLogout() {
-    localStorage.removeItem('token');
+    localStorage.removeItem(config.localStorageTokenKey);
     return this.setState({ user: null });
   }
 
@@ -75,6 +79,10 @@ class App extends React.Component {
     return (
       <Container fixed>
         <CssBaseline />
+
+        <Grid container justify="flex-end">
+          <Config config={config} />
+        </Grid>
 
         <Grid className={classes.root} justify="center" container spacing={3}>
           <Grid item sm={6}>

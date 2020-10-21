@@ -13,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
 
 import api from '../services/api'
+import config from '../config';
 
 class Tasks extends React.Component {
   constructor(props) {
@@ -48,7 +49,8 @@ class Tasks extends React.Component {
       name: this.state.newTask.name.value,
     }
 
-    return api.post('/tasks/', params).then((resp) => {
+
+    return api.post(config.urls.tasks, params).then((resp) => {
       this.refreshTasks()
 
       this.setState({
@@ -74,13 +76,13 @@ class Tasks extends React.Component {
   }
 
   refreshTasks() {
-    return api.get(`/tasks/`, { params: { project: this.state.project.id }}).then((tasks) => {
+    return api.get(config.urls.tasks, { params: { project: this.state.project.id }}).then((tasks) => {
       this.setState({ tasks: tasks.data })
     })
   }
 
   removeTask(task) {
-    return api.delete(`/tasks/${task.id}`).then(response => {
+    return api.delete(`${config.urls.tasks}${task.id}`).then(response => {
       const tasks = this.state.tasks.filter((item) => item.id !== task.id)
       this.setState({ tasks })
     })
@@ -92,7 +94,7 @@ class Tasks extends React.Component {
     t.edit = !t.edit
 
     if (t.edit === false) {
-      return api.put(`/tasks/${task.id}/`, task).then((resp) => {
+      return api.put(`${config.urls.tasks}${task.id}/`, task).then((resp) => {
         this.refreshTasks()
       })
     }
